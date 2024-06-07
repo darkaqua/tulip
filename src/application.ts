@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
-import { ApplicationProps, DisplayObject, DisplayObjectMutable } from "./types";
+import {ApplicationProps, ContainerReactivity, DisplayObject, DisplayObjectMutable} from "./types";
 import { APPLICATION_DEFAULT_PROPS } from "./consts";
+import {render} from "./render";
 
 export const application = async ({
   backgroundColor = APPLICATION_DEFAULT_PROPS.backgroundColor,
@@ -38,5 +39,8 @@ export const application = async ({
     add: (displayObjectMutable: DisplayObjectMutable<DisplayObject>) => {
       application.stage.addChild(displayObjectMutable.getDisplayObject());
     },
+    add2: (Component: Function) => {
+      render(Component, application.stage as ContainerReactivity)
+    }
   };
 };

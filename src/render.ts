@@ -1,0 +1,70 @@
+import {ContainerReactivity} from "./types";
+import {compare} from "./utils/data.utils";
+
+// Hooks vars
+let hooks;
+let index = 0;
+let forceUpdate;
+
+const getHook = value => {
+  let hook = hooks[index++];
+  if (!hook) {
+    hook = { value };
+    hooks.push(hook);
+  }
+
+  return hook;
+};
+
+export const useReducer = (reducer, initialState) => {
+  const hook = getHook(initialState);
+  const update = forceUpdate;
+
+  const dispatch = action => {
+    if (typeof action === 'function') {
+      action = action(hook.value);
+    }
+
+    hook.value = reducer(hook.value, action);
+    update();
+  };
+
+  return [hook.value, dispatch];
+};
+
+export const useState = initialState => useReducer((_, v) => v, initialState);
+
+export const useEffect = (cb: Function, args = []) => {
+  const hook = getHook();
+  if (compare(hook.value, args)) {
+    hook.value = args;
+    hook.cb = cb;
+  }
+};
+
+export const render = (component: Function, container: ContainerReactivity) => {
+  const currentHooks = container.hooks || {};
+  container.hooks = {};
+
+  forceUpdate = () => render(component, container);
+  hooks = currentHooks[container.uid] || [];
+  index = 0;
+  const _node = component();
+
+  // Not sure...
+  container.addChild(_node.getDisplayObject());
+
+  container.hooks[container.uid] = hooks;
+
+  // Hooks
+  Object.values(container.hooks)
+    .forEach((cHooks) =>
+      cHooks.forEach(hook => {
+        if (hook.cb) {
+          hook.cleanup = hook.cb();
+          hook.cb = 0;
+        }
+      }
+    )
+  );
+};
