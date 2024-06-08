@@ -7,6 +7,7 @@ export * from "./application.types";
 export * from "./functions.types";
 export * from "./component.types";
 export * from "./body.types";
+export * from "./hook.types";
 
 export * from "./components";
 export * from "./shapes";

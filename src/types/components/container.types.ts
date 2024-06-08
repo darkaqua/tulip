@@ -3,7 +3,7 @@ import {
   DisplayObjectProps,
 } from "../display-object.types";
 import { Container } from "../pixi.types";
-import {Hook} from "../hooks.types";
+import {Hook} from "../hook.types";
 
 export type ContainerProps = {} & DisplayObjectProps;
 

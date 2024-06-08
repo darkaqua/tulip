@@ -1,12 +1,12 @@
-import {ContainerReactivity} from "./types";
+import {ContainerReactivity, Hook, UseEffectCB} from "./types";
 import {compare} from "./utils/data.utils";
 
 // Hooks vars
-let hooks;
+let hooks: Hook[];
 let index = 0;
 let forceUpdate;
 
-const getHook = value => {
+const getHook = (value?: any): Hook => {
   let hook = hooks[index++];
   if (!hook) {
     hook = { value };
@@ -34,7 +34,7 @@ export const useReducer = (reducer, initialState) => {
 
 export const useState = initialState => useReducer((_, v) => v, initialState);
 
-export const useEffect = (cb: Function, args = []) => {
+export const useEffect = (cb: UseEffectCB, args = []) => {
   const hook = getHook();
   if (compare(hook.value, args)) {
     hook.value = args;
@@ -49,6 +49,9 @@ export const render = (component: Function, container: ContainerReactivity) => {
   forceUpdate = () => render(component, container);
   hooks = currentHooks[container.uid] || [];
   index = 0;
+
+  container.removeChildren()
+
   const _node = component();
 
   // Not sure...
@@ -60,11 +63,11 @@ export const render = (component: Function, container: ContainerReactivity) => {
   Object.values(container.hooks)
     .forEach((cHooks) =>
       cHooks.forEach(hook => {
-        if (hook.cb) {
-          hook.cleanup = hook.cb();
-          hook.cb = 0;
+          if (hook.cb) {
+            hook.cleanup = hook.cb();
+            hook.cb = undefined
+          }
         }
-      }
-    )
-  );
+      )
+    );
 };
