@@ -2,7 +2,7 @@ import {
   Container,
   container as containerComponent,
   DisplayObjectMutable,
-  Function,
+  Function, plane,
   world
 } from "../../../src/mod";
 import {useEffect, useReducer, useState} from "../../../src/render";
@@ -69,13 +69,31 @@ export const app: Function<unknown, Mutable> = () => {
     label: "world",
   });
 
+  const _plane = plane({
+    position: {
+      x: 0,
+      y: 100,
+    },
+    angle: 45,
+  });
+  _world.add(_plane);
+
+  const _plane2 = plane({
+    position: {
+      x: 400,
+      y: 100,
+    },
+    angle: -45,
+  });
+  _world.add(_plane2);
+
   for(let i = 0; i < count; i++) {
     const _ball = ball({
       label: `ball${i}`,
       color: 0x00ff00,
     });
 
-    _ball.setPosition({ x: i * 5 + 100, y: i * 5 + 10 });
+    _ball.setPosition({ x: i * 10 + 100, y: i * 5 + 10 });
 
     _world.add(_ball)
   }
